@@ -1,7 +1,6 @@
 #Java JDBC连接各种数据库的配置方法
 
 ##MySQL：
-###Java代码  收藏代码
 ```
 String Driver="com.mysql.jdbc.Driver";    //驱动程序
 //连接的URL,db_name为数据库名
@@ -13,7 +12,6 @@ Connection con=DriverManager.getConnection(URL,Username,Password);
 ```
 
 ##Microsoft SQL Server 2.0驱动(3个jar):
-###Java代码  收藏代码
 ```
 //连接SQL数据库的方法
 String Driver="com.microsoft.jdbc.sqlserver.SQLServerDriver";
@@ -24,9 +22,9 @@ String Password="password";    //密码
 Class.forName(Driver);    //加载数据可驱动
 Connection con=DriverManager.getConnection(URL,UserName,Password);
 ```
- Microsoft SQL Server 3.0驱动(1个jar):
 
-Java代码  收藏代码
+##Microsoft SQL Server 3.0驱动(1个jar):
+```
 //连接SQL数据库的方法
 String Driver="com.microsoft.sqlserver.jdbc.SQLServerDriver";
 //db_name为数据库名
@@ -35,18 +33,20 @@ String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);    //加载数据可驱动
 Connection con=DriverManager.getConnection(URL,UserName,Password);
- Oracle(用thin模式):
+```
 
-Java代码  收藏代码
+##Oracle(用thin模式):
+```
 String Driver="oracle.jdbc.driver.OracleDriver";    //连接数据库的方法
 String URL="jdbc:oracle:thin:@loaclhost:1521:orcl";    //orcl为数据库的SID
 String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);    //加载数据库驱动
 Connection con=DriverManager.getConnection(URL,Username,Password);
- DB2：
+```
 
-Java代码  收藏代码
+##DB2：
+```
 //连接具有DB2客户端的Provider实例
 String Driver="com.ibm.db2.jdbc.app.DB2.Driver";
 //db_name为数据可名
@@ -55,9 +55,10 @@ String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);
 Connection con=DriverManager.getConnection(URL,Username,Password);
- PostgreSQL:
+```
 
-Java代码  收藏代码
+##PostgreSQL:
+```
 String Driver="org.postgresql.Driver";    //连接数据库的方法
 //db_name为数据可名
 String URL="jdbc:postgresql://localhost/db_name";
@@ -65,19 +66,20 @@ String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);
 Connection con=DriverManager.getConnection(URL,Username,Password);
- JDBC-ODBC:
+```
 
-Java代码  收藏代码
+##JDBC-ODBC:
+```
 String Driver="sun.jdbc.odbc.JdbcOdbcDriver";
 String URL="jdbc:odbc:dbsource";    //dbsource为数据源名
 String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);
 Connection con=DriverManager.getConnection(URL,Username,Password);
+```
 
-Properties:
-
-Java代码  收藏代码
+#Properties:
+```
 # 示例配置参考，涵盖几乎所有的主流数据库
 ############# Oracle数据库 ########################
 #   数据库驱动名
@@ -156,3 +158,4 @@ password= abcdef
 datasource=java:comp/env/jdbc/db_ds
 ############# Websphere/WebLogic数据源 ##################
 #datasource=db_ds
+```
