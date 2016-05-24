@@ -1,7 +1,8 @@
-Java JDBC连接各种数据库的配置方法
+#Java JDBC连接各种数据库的配置方法
 
-MySQL：
-Java代码  收藏代码
+##MySQL：
+###Java代码  收藏代码
+'''
 String Driver="com.mysql.jdbc.Driver";    //驱动程序
 //连接的URL,db_name为数据库名
 String URL="jdbc:mysql://localhost:3306/db_name";
@@ -9,9 +10,11 @@ String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);
 Connection con=DriverManager.getConnection(URL,Username,Password);
- Microsoft SQL Server 2.0驱动(3个jar):
+'''
 
-Java代码  收藏代码
+##Microsoft SQL Server 2.0驱动(3个jar):
+###Java代码  收藏代码
+'''
 //连接SQL数据库的方法
 String Driver="com.microsoft.jdbc.sqlserver.SQLServerDriver";
 //db_name为数据库名
@@ -20,6 +23,7 @@ String Username="username";    //用户名
 String Password="password";    //密码
 Class.forName(Driver);    //加载数据可驱动
 Connection con=DriverManager.getConnection(URL,UserName,Password);
+'''
  Microsoft SQL Server 3.0驱动(1个jar):
 
 Java代码  收藏代码
