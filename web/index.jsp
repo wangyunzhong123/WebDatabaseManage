@@ -47,7 +47,7 @@
           输入要连接的数据库信息
         </h4>
       </div>
-      <form action="get_conn" method="get">
+      <form action="getdata" method="get">
         <div class="modal-body">
           <div class="modal-content_my">选择数据库类型:
             <select name="dbtype" class="form-control">
