@@ -1,13 +1,11 @@
 package com.wyz.controller;
 
-import com.alibaba.fastjson.JSONException;
 import com.wyz.entity.Data;
 import com.wyz.entity.DatabaseInfo;
 import com.wyz.entity.Head;
 import com.wyz.entity.Table;
-import javafx.scene.control.Tab;
-import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.portlet.ModelAndView;
@@ -24,6 +22,7 @@ import java.util.List;
  * Created by tianxi on 16-5-24.
  */
 @Controller
+//@Service
 public class connectDBController {
     private String sql_server_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private String oracle_driver = "oracle.jdbc.driver.OracleDriver";
@@ -151,6 +150,8 @@ public class connectDBController {
         dataList.add(datalist);//5行数据
         request.setAttribute("headList",headList);
         request.setAttribute("dataList",dataList);
+        //表名
+        request.setAttribute("tableName","test");
 
         //
         System.out.println("返回之前");
@@ -161,7 +162,7 @@ public class connectDBController {
 
     //根据表名请求数据
     @RequestMapping(value = "getData",method={RequestMethod.GET})
-    public ModelAndView getData(String tableName,HttpServletRequest request, HttpServletResponse response) throws IOException ,java.sql.SQLException{
+    public String getData(String tableName,HttpServletRequest request, HttpServletResponse response) throws IOException ,java.sql.SQLException{
         ResultSet re = databaseMetaData.getColumns(
                 catalog, schemaPattern,  tableName, null);
 
@@ -183,16 +184,13 @@ public class connectDBController {
 
         Statement st=connection.createStatement();
         ResultSet rs=st.executeQuery("select * from "+tableName);
+        ResultSetMetaData rdata = rs.getMetaData();
         while(rs.next()){
 //            String name=rs.getString("username");
 //            int age=rs.getInt(3);     //这里的“3”指数据表中的第3个字段的值
             List<Data> datalist = new ArrayList<>();
-            for(int i=0;i<headList.size();i++){
-//                if(i==0 || i==3)
-//                    datalist.add(new Data(String.valueOf(rs.getInt(i))));
-//                else
-                    datalist.add(new Data(rs.getString(i)));
-
+            for(int i=1;i<=rdata.getColumnCount();i++){
+                datalist.add(new Data(String.valueOf(rs.getObject(i))));
             }
             dataList.add(datalist);
         }
@@ -202,6 +200,8 @@ public class connectDBController {
         //发送列名
         request.setAttribute("headList",headList);
         request.setAttribute("dataList",dataList);
-        return new ModelAndView("getdata");
+        //表名
+        request.setAttribute("tableName",tableName);
+        return "getdata";
     }
 }

@@ -1,3 +1,8 @@
 .nav_my_ul li:active{
 
 }
+.td_null{
+    border:1px #ff0400 solid;
+    background-color: darkseagreen;
+    /*background-image: */
+}

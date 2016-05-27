@@ -80,46 +80,50 @@
                     List<Table> tableList = (List<Table>)session.getAttribute("tableList");
                 %>
                 <c:forEach items="<%=tableList%>" var="table" varStatus="vs">
-                    <li><a href="getData?tableName=${table.name}" >${vs.index+1}.${table.name}</a></li>
+                    <li><a href="<%=basePath%>getData?tableName=${table.name}" >${vs.index+1}.${table.name}</a></li>
                 </c:forEach>
             </ul>
 
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-            <h2 class="sub-header">数据内容</h2>
-            <div class="table-responsive">
+            <h2 class="sub-header">数据内容-${tableName}</h2>
+            <button onclick="javascript:writeExcel()" type="button" class="btn btn-primary">导出为excel</button>
+            <div class="table-responsive table2excel">
                 <table class="table table-striped">
                     <thead id="thead">
                     <tr>
-                        <%--<th>#</th>--%>
                         <c:forEach items="${headList}" var="head" varStatus="vs">
                             <th>${head.name}</th>
                         </c:forEach>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody id="tbody">
-                    <%--<tr>--%>
-                        <%--<td>1,001</td>--%>
-                        <%--<td>LorLoremLoremLoremem</td>--%>
-                        <%--<td>ipLoremLoremLoremsum</td>--%>
-                        <%--<td>dolor</td>--%>
-                        <%--<td>sit</td>--%>
-                        <%--<td>sit</td>--%>
-                        <%--<td>sLoremLoremLoremLoremLore--%>
-                        <%--<td>sit</td>--%>
-                        <%--<td>sit</td>--%>
-                    <%--</tr>--%>
                     <c:forEach items="${dataList}" var="dataRow" varStatus="vs">
                         <tr>
                             <c:forEach items="${dataRow}" var="content" varStatus="vs">
-                                <td>${content.context}</td>
+                                <%--<c:if test="${content.context == 'null'}">--%>
+                                    <%--<td class="td_null"></td>--%>
+                                <%--</c:if>--%>
+                                <c:choose>
+                                    <c:when test="${content.context == 'null'}">
+                                        <td class="td_null"></td>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <td>${content.context}</td>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:forEach>
+                            <td><a href="javascript:void(0);"><span onclick="javascript:deleteTr(this);" class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                                <a href="javascript:void(0);" ><span id="edit" onclick="javascript:editTr(this);" class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
+                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>
                 </table>
             </div>
+            <button onclick="javascript:writeExcel()" type="button" class="btn btn-primary">导出为excel</button>
         </div>
     </div>
 </div>
@@ -129,6 +133,7 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="<%=basePath%>resources/js/jquery.min.js"></script>
 <script src="<%=basePath%>resources/js/bootstrap.min.js"></script>
+<script src="<%=basePath%>resources/js/jquery.table2excel.js"></script>
 <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
 <script src="../../assets/js/vendor/holder.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
@@ -155,6 +160,45 @@
             }
         });
     }
+    //删除一行数据
+    function deleteTr(it){
+        if(confirm("你确认删除这条数据吗？")){
+            $(it).parent().parent().parent().remove();
+        }
+    }
+    //编辑这一行数据
+    function editTr(it){
+        var id = $(it).attr("id");
+        $(it).attr("id",id=="edit"?"confirm":"edit");
+        if($(it).attr("id") == "edit"){
+            $(it).removeClass("glyphicon glyphicon-ok");
+            $(it).addClass("glyphicon glyphicon-pencil");
+        }else if($(it).attr("id") == "confirm"){
+            $(it).removeClass("glyphicon glyphicon-pencil");
+            $(it).addClass("glyphicon glyphicon-ok");
+        }
+
+        $(it).parent().parent().siblings("td").each(function() {  // 获取当前行的其他单元格
+            obj_text = $(this).find("input:text");    // 判断单元格下是否有文本框
+            if(!obj_text.length)   // 如果没有文本框，则添加文本框使之可以编辑
+                $(this).html("<input type='text' value='"+$(this).text()+"'>");
+            else   // 如果已经存在文本框，则将其显示为文本框修改的值
+                $(this).html(obj_text.val());
+        });
+
+    }
+    //写excel文件
+    function writeExcel() {
+        $(".table2excel").table2excel({
+            exclude: ".noExl",
+            name: "导出表",
+            filename: "${tableName}",
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+        });
+    }
+
 </script>
 </body>
 </html>
