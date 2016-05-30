@@ -61,9 +61,12 @@
                 <li><a href="#">Profile</a></li>
                 <li><a href="#">Help</a></li>
             </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
+            <div class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search..."
+                       name="search" id="searchbtn" onkeypress="if(event.keyCode==13){
+                       window.location.href = '<%=basePath%>getData?tableName='+document.getElementById('searchbtn').value;
+                       }">
+            </div>
         </div>
     </div>
 </nav>
@@ -197,6 +200,13 @@
             exclude_links: true,
             exclude_inputs: true
         });
+    }
+
+    //搜索栏
+    function search(){
+        var tablename = document.getElementById("searchbtn").value;
+        alert(tablename);
+        window.location.href = "<%=basePath%>getData?tableName="+document.getElementById("searchbtn").value;
     }
 
 </script>

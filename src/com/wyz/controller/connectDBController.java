@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by tianxi on 16-5-24.
@@ -38,31 +40,55 @@ public class connectDBController {
 
 
     @RequestMapping(value="getdata",method={RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView get_conn(DatabaseInfo databaseInfo, HttpServletRequest request, HttpServletResponse response) throws IOException,java.sql.SQLException{
+    public String get_conn(DatabaseInfo databaseInfo, HttpServletRequest request, HttpServletResponse response) throws IOException,java.sql.SQLException{
 //        return new ModelAndView("index");
 //        Log4JLogger.
         System.out.println("收到get_conn请求");
         System.out.println(databaseInfo.toString());
         String returnUrl ="getdata";
+        String dburl = null;
         switch (databaseInfo.getDbtype()){
             case "sql_server":
-                return to_sql_server(databaseInfo,request,response);
+                dburl=to_sql_server(databaseInfo,request,response);
+                break;
             case "oracle":
-                return to_oracle(databaseInfo,request,response);
+                dburl=to_oracle(databaseInfo,request,response);
+                break;
             case "mysql":
-                returnUrl = to_mysql(databaseInfo,request,response);
+                dburl=to_mysql(databaseInfo,request,response);
+                break;
+            default:
+                dburl=to_mysql(databaseInfo,request,response);
         }
-        return new ModelAndView(returnUrl);
+        conn(dburl,databaseInfo,request,response);
+        return returnUrl;
     }
 
     //sql_server数据库
-    private ModelAndView to_sql_server(DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response){
-        return null;
+    private String to_sql_server(DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response)throws java.sql.SQLException{
+        try {
+            Class.forName(sql_server_driver);
+        } catch (ClassNotFoundException cnfe) {
+            System.out.println("Can't load "+sql_server_driver+", exiting...");
+//            System.exit(-1);
+        }// 动态加载mysql驱动
+        String dburl = "jdbc:microsoft:sqlserver://"+databaseInfo.getUrl();//geturl的格式为IP/表名
+        //jdbc:microsoft:sqlserver://
+        System.out.println("完成to_sql_server");
+        return dburl;
 
     }
     //oracle数据库
-    private ModelAndView to_oracle(DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response){
-        return null;
+    private String to_oracle(DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response)throws java.sql.SQLException{
+        try {
+            Class.forName(oracle_driver);
+        } catch (ClassNotFoundException cnfe) {
+            System.out.println("Can't load "+oracle_driver+", exiting...");
+//            System.exit(-1);
+        }// 动态加载mysql驱动
+        String dburl = "jdbc:oracle:thin://@"+databaseInfo.getUrl();//geturl的格式为IP/表名
+        //jdbc:oracle\:thin\://@
+        return dburl;
 
     }
     //mysql数据库
@@ -80,9 +106,15 @@ public class connectDBController {
         // or：
         // new com.mysql.jdbc.Driver();
         String dburl = "jdbc:mysql://"+databaseInfo.getUrl();//geturl的格式为IP/表名
+        return dburl;
+
+    }
+    //不同数据库的公共部分，获取表
+    private void conn(String dburl,DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response)throws java.sql.SQLException{
         System.out.println(dburl);
         connection = DriverManager.getConnection(dburl,databaseInfo.getName(),databaseInfo.getKey());
         databaseMetaData = connection.getMetaData();
+
         int    majorVersion   = databaseMetaData.getDatabaseMajorVersion();
         int    minorVersion   = databaseMetaData.getDatabaseMinorVersion();
         String productName    = databaseMetaData.getDatabaseProductName();
@@ -155,9 +187,7 @@ public class connectDBController {
 
         //
         System.out.println("返回之前");
-        return "getdata";
-
-
+//        return "getdata";
     }
 
     //根据表名请求数据
@@ -166,6 +196,26 @@ public class connectDBController {
         ResultSet re = databaseMetaData.getColumns(
                 catalog, schemaPattern,  tableName, null);
 
+        int j=0;
+        for(j=0;j<tableList.size();j++){
+            if(tableList.get(j).getName().equals(tableName))
+                break;
+        }
+        if(j == tableList.size()){//没找到
+            //发送表名
+            HttpSession session = request.getSession();
+            session.setAttribute("tableList",tableList);
+            request.setAttribute("tableName",tableName+"...没有此表信息");
+            //将列名发送到页面显示
+            List<Head> headList = new ArrayList<>();
+            //具体数据信息
+            List<List<Data>> dataList = new ArrayList<>();
+            //发送列名
+            request.setAttribute("headList",headList);
+            request.setAttribute("dataList",dataList);
+
+            return "getdata";
+        }
         //将列名发送到页面显示
         List<Head> headList = new ArrayList<>();
 
@@ -183,7 +233,7 @@ public class connectDBController {
         List<List<Data>> dataList = new ArrayList<>();
 
         Statement st=connection.createStatement();
-        ResultSet rs=st.executeQuery("select * from "+tableName);
+        ResultSet rs=st.executeQuery("select distinct * from "+tableName);
         ResultSetMetaData rdata = rs.getMetaData();
         while(rs.next()){
 //            String name=rs.getString("username");
@@ -204,4 +254,24 @@ public class connectDBController {
         request.setAttribute("tableName",tableName);
         return "getdata";
     }
+
+    //如果10分钟没有操作请求，关闭conn
+//    private class TimeCloseCon{
+//        private TimeCloseCon(){
+//            Timer timer = new Timer();
+//            timer.scheduleAtFixedRate(new TimerTask() {
+//                public void run() {
+//
+//
+//                }
+//            }, 100, 1000*3600*2);
+//        }
+//        private static TimeCloseCon TimeCloseCon = new TimeCloseCon();
+//
+//        public static TimeCloseCon getInstance(){
+//            if(TimeCloseCon != null)
+//                return TimeCloseCon;
+//            return new TimeCloseCon();
+//        }
+//    }
 }
