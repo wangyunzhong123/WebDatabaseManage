@@ -2,6 +2,7 @@ package com.wyz.controller;
 
 import com.wyz.entity.Api;
 import com.wyz.entity.DatabaseInfo;
+import com.wyz.entity.Table;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,8 +12,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,10 +29,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by tianxi on 16-5-30.
@@ -38,14 +38,21 @@ import java.io.IOException;
 public class ApisController {
 
     @RequestMapping(value="addApi",method={RequestMethod.POST, RequestMethod.GET})
-    public String addApis(Api api, HttpServletRequest request, HttpServletResponse response) {
+    public String addApis(Api api, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+//        request.setCharacterEncoding("UTF-8");
+
         DocumentBuilderFactory factory= DocumentBuilderFactory.newInstance();
         Element theBook=null, theElem=null, root=null;
         try {
             factory.setIgnoringElementContentWhitespace(true);
 
-            DocumentBuilder db=factory.newDocumentBuilder();
-            Document xmldoc=db.parse(new File("/home/tianxi/MyXml.xml"));
+            DocumentBuilder db=factory.newDocumentBuilder();//session.getServletContext().getRealPath("/") + "resources/images/act/worldcup_merge/worldcup720.png";
+//            InputStream input = Table.class.getResourceAsStream("/WEB-INF/resources/apis.xml");
+//            InputStream input = new File(session.getServletContext().getRealPath("/") + "resources/images/act/worldcup_merge/worldcup720.png");
+//            System.out.println(ServletContext.class.)
+
+            String path = session.getServletContext().getRealPath("/") + "WEB-INF/resources/apis.xml";
+            Document xmldoc=db.parse(new File(path));
             root=xmldoc.getDocumentElement();
 
             //--- 新建一本书开始 ----
@@ -94,7 +101,7 @@ public class ApisController {
 
             System.out.println("--- 新建api结束 ----"+api.toString());
             output(xmldoc);
-            saveXml("/home/tianxi/MyXml.xml", xmldoc);
+            saveXml(path, xmldoc);
 
 
 //            //--- 新建一本书完成 ----

@@ -36,9 +36,9 @@
   </button>
 </div>
 <div>
-  <button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#viewApis">
+  <a href="/resources/apis.xml" target="_blank"><button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#viewApis">
     查看数据服务接口
-  </button>
+  </button></a>
 </div>
 <div>
   <button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#addApis">
@@ -111,7 +111,7 @@
           添加数据服务接口
         </h4>
       </div>
-      <form action="addApi" method="get">
+      <form action="addApi" method="post" accept-charset="utf-8">
         <div class="modal-body">
           <div class="modal-content_my">该接口所属类:
             <select name="cata" class="form-control">
@@ -124,7 +124,7 @@
           <div class="input-group">
             <span class="input-group-addon">名称:</span>
             <input type="text" name="name" class="form-control" placeholder="填写接口名称">
-          </div>
+          </div><br>
 
           <div class="input-group">
             <span class="input-group-addon">功能:</span>
@@ -143,6 +143,10 @@
           <div class="input-group">
             <span class="input-group-addon">url:</span>
             <input type="text" name="url" class="form-control" placeholder="填写请求url">
+          </div><br>
+          <div class="input-group">
+            <span class="input-group-addon">返回格式:</span>
+            <input type="text" name="reback" class="form-control" placeholder="填写返回格式">
           </div><br>
           <div class="input-group">
             <span class="input-group-addon">示例:</span>
