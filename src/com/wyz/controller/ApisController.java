@@ -1,5 +1,6 @@
 package com.wyz.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.wyz.entity.Api;
 import com.wyz.entity.DatabaseInfo;
 import com.wyz.entity.Table;
@@ -30,12 +31,16 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by tianxi on 16-5-30.
  */
 @Controller
 public class ApisController {
+
+    private static String path = "/home/tianxi/apis.xml";
 
     @RequestMapping(value="addApi",method={RequestMethod.POST, RequestMethod.GET})
     public String addApis(Api api, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
@@ -51,7 +56,7 @@ public class ApisController {
 //            InputStream input = new File(session.getServletContext().getRealPath("/") + "resources/images/act/worldcup_merge/worldcup720.png");
 //            System.out.println(ServletContext.class.)
 
-            String path = session.getServletContext().getRealPath("/") + "WEB-INF/resources/apis.xml";
+//            String path = session.getServletContext().getRealPath("/") + "WEB-INF/resources/apis.xml";
             Document xmldoc=db.parse(new File(path));
             root=xmldoc.getDocumentElement();
 
@@ -143,7 +148,7 @@ public class ApisController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "index";
+        return "redirect:/listApi";
     }
     public void output(Node node) {//将node的XML字符串输出到控制台
         TransformerFactory transFactory=TransformerFactory.newInstance();
@@ -209,4 +214,124 @@ public class ApisController {
             e.printStackTrace();
         }
     }
+
+    //删除
+    @RequestMapping(value="deleteApi",method={RequestMethod.POST, RequestMethod.GET})
+    public void deleteApi(int index, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+        DocumentBuilderFactory factory= DocumentBuilderFactory.newInstance();
+        try {
+            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilder db=factory.newDocumentBuilder();//session.getServletContext().getRealPath("/") + "resources/images/act/worldcup_merge/worldcup720.png";
+            Document xmldoc=db.parse(path);
+            Node node = xmldoc.getElementsByTagName("api").item(index);
+            node.getParentNode().removeChild(node);
+            saveXml(path, xmldoc);
+            JSONObject ret = new JSONObject();
+            ret.put("result",1);
+            response.getOutputStream().write(ret.toString().getBytes("utf-8"));
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+        }
+    }
+
+    //修改
+    @RequestMapping(value="editApi",method={RequestMethod.POST, RequestMethod.GET})
+    public void editApi(int index,Api api, HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+        DocumentBuilderFactory factory= DocumentBuilderFactory.newInstance();
+        try {
+            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilder db=factory.newDocumentBuilder();//session.getServletContext().getRealPath("/") + "resources/images/act/worldcup_merge/worldcup720.png";
+            Document xmldoc=db.parse(path);
+            Element element1 = (Element)xmldoc.getElementsByTagName("cata").item(index);
+            element1.setTextContent(api.getCata());
+            Element element2 = (Element)xmldoc.getElementsByTagName("name").item(index);
+            element2.setTextContent(api.getName());
+            Element element3 = (Element)xmldoc.getElementsByTagName("todo").item(index);
+            element3.setTextContent(api.getTodo());
+            Element element4 = (Element)xmldoc.getElementsByTagName("method").item(index);
+            element4.setTextContent(api.getMethod());
+            Element element5 = (Element)xmldoc.getElementsByTagName("para").item(index);
+            element5.setTextContent(api.getPara());
+            Element element6 = (Element)xmldoc.getElementsByTagName("url").item(index);
+            element6.setTextContent(api.getUrl());
+            Element element7 = (Element)xmldoc.getElementsByTagName("demo").item(index);
+            element7.setTextContent(api.getDemo());
+            Element element8 = (Element)xmldoc.getElementsByTagName("reback").item(index);
+            element8.setTextContent(api.getReback());
+            saveXml(path, xmldoc);
+            JSONObject ret = new JSONObject();
+            ret.put("result",1);
+            response.getOutputStream().write(ret.toString().getBytes("utf-8"));
+            return ;
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+        }
+    }
+
+    //查看
+    @RequestMapping(value="listApi",method={RequestMethod.POST, RequestMethod.GET})
+    public String listApi(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+
+        List<Api> apiList = new ArrayList<>();
+        NodeList apis = null;
+        DocumentBuilderFactory factory= DocumentBuilderFactory.newInstance();
+        try {
+            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilder db=factory.newDocumentBuilder();//session.getServletContext().getRealPath("/") + "resources/images/act/worldcup_merge/worldcup720.png";
+            Document xmldoc=db.parse(path);
+//            Element root = xmldoc.getDocumentElement();
+//            apis = root.getChildNodes();
+            apis = xmldoc.getElementsByTagName("api");
+//            apis = xmldoc.getElementsByTagName("api");
+            for(int i=0;i<apis.getLength();i++){
+//                String expression = "/apis/api["+i+"]";
+//                Node apiNode = selectSingleNode(expression, root);
+                Element node = (Element)apis.item(i);
+                if (true) {
+                    Api api = new Api();
+                    if(node.getElementsByTagName("cata").item(0).getFirstChild() !=null)
+                        api.setCata(node.getElementsByTagName("cata").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("name").item(0).getFirstChild() !=null)
+                        api.setName(node.getElementsByTagName("name").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("todo").item(0).getFirstChild() !=null)
+                        api.setTodo(node.getElementsByTagName("todo").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("method").item(0).getFirstChild() !=null)
+                        api.setMethod(node.getElementsByTagName("method").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("para").item(0).getFirstChild() !=null)
+                        api.setPara(node.getElementsByTagName("para").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("url").item(0).getFirstChild() !=null)
+                        api.setUrl(node.getElementsByTagName("url").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("demo").item(0).getFirstChild() !=null)
+                        api.setDemo(node.getElementsByTagName("demo").item(0).getFirstChild().getNodeValue());
+                    if(node.getElementsByTagName("reback").item(0).getFirstChild() !=null)
+                        api.setReback(node.getElementsByTagName("reback").item(0).getFirstChild().getNodeValue());
+                    apiList.add(api);
+                }
+            }
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        request.setAttribute("apiList",apiList);
+        return "index";
+    }
+
+    @RequestMapping(value="get_database_design",method={RequestMethod.POST, RequestMethod.GET})
+    public String get_database_design(HttpServletRequest request, HttpServletResponse response) {
+        return "database_design";
+    }
+
 }

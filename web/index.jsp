@@ -5,7 +5,8 @@
   Time: 上午9:52
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" autoFlush="false" buffer="512kb"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
   String path=request.getContextPath();
   String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -14,37 +15,119 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>数据管理</title>
-  <link rel="stylesheet" href="<%=basePath%>resources/css/bootstrap.min.css" />
-  <style type="text/css">
-    .my_button{
-      margin: 50px auto auto 160px;
-      display: block;
-    }
-    .content{
-      background-color: #1abc9c;
-    }
-    .modal-content_my{
-      margin: 10px 15px 10px 5px;;
+  <link href="<%=basePath%>resources/css/bootstrap.min.css" rel="stylesheet">
 
-    }
-  </style>
+  <!-- Custom styles for this template -->
+  <link href="<%=basePath%>resources/css/dashboard.css" rel="stylesheet">
+  <link href="<%=basePath%>resources/css/datamanagecss.css" rel="stylesheet">
+
+  <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+  <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+  <script src="<%=basePath%>resources/js/ie-emulation-modes-warning.js"></script>
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
 </head>
-<body class="content">
-<div>
-  <button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#toGetData">
-    抓取平台数据
-  </button>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">朝阳数据管理</a>
+    </div>
+  </div>
+</nav>
+
+<div class="row">
+  <div class="col-sm-3 col-md-2 sidebar">
+    <ul class="nav nav-sidebar nav_my_ul">
+      <li class="active"><a href="#">相关操作 <span class="sr-only">(current)</span></a></li>
+      <li><a href="<%=basePath%>get_database_design" target="_blank">数据标准规范</a></li>
+      <li><a href="#" data-toggle="modal" data-target="#toGetData">数据抓取平台</a></li>
+      <li><a href="javascript:writeExcel();" target="_blank">数据服务接口</a></li>
+      <li><a href="javascript:alert('请使用相应的数据库管理软件操作！')">数据结构扩展</a></li>
+      <li><a href="#">多元数据采集</a></li>
+      <li><a href="#">数据资源管理</a></li>
+      <li class="active_1"><a href="#" data-target="#addApis">标准化数据服务管理</a></li>
+    </ul>
+
+  </div>
+  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+    <h2 class="sub-header">接口内容-${tableName}</h2>
+    <button onclick="javascript:addApi()" type="button" class="btn btn-primary" data-toggle="modal" data-target="#addApis" >增加接口信息</button>
+    <div class="table-responsive table2excel">
+      <table class="table table-striped">
+        <thead id="thead">
+        <tr>
+          <th>编号</th>
+          <th>分类</th>
+          <th>名称</th>
+          <th>功能</th>
+          <th>请求方法</th>
+          <th>参数</th>
+          <th>url</th>
+          <th>示例</th>
+          <th>返回</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="tbody">
+          <c:forEach items="${apiList}" var="apiRow" varStatus="vs">
+            <tr>
+              <td>${vs.index}</td>
+              <td>${apiRow.cata}</td>
+              <td>${apiRow.name}</td>
+              <td>${apiRow.todo}</td>
+              <td>${apiRow.method}</td>
+              <td>${apiRow.para}</td>
+              <td>${apiRow.url}</td>
+              <td>${apiRow.demo}</td>
+              <td>${apiRow.reback}</td>
+              <td><a href="javascript:void(0);"><span onclick="javascript:deleteTr(this,${vs.index});" class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                <a href="javascript:void(0);" ><span id="edit" onclick="javascript:editTr(this,${vs.index});" class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
+              </td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
+    <button onclick="javascript:writeExcel()" type="button" class="btn btn-primary">确定修改</button>
+  </div>
 </div>
-<div>
-  <a href="/resources/apis.xml" target="_blank"><button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#viewApis">
-    查看数据服务接口
-  </button></a>
-</div>
-<div>
-  <button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#addApis">
-    管理数据服务接口
-  </button>
-</div>
+
+
+<%--<div>--%>
+  <%--<button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#toGetData">--%>
+    <%--抓取平台数据--%>
+  <%--</button>--%>
+<%--</div>--%>
+<%--<div>--%>
+  <%--<a href="/resources/apis.xml" target="_blank"><button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#viewApis">--%>
+    <%--查看数据服务接口--%>
+  <%--</button></a>--%>
+<%--</div>--%>
+<%--<div>--%>
+  <%--<button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#addApis">--%>
+    <%--管理数据服务接口--%>
+  <%--</button>--%>
+<%--</div>--%>
+<%--<div>--%>
+  <%--<a href="<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()%>+'/wb' " target="_blankleigang--%>
+
+  <%--"><button class="my_button btn btn-primary btn-lg" data-toggle="modal" data-target="#">--%>
+    <%--数据资源管理--%>
+  <%--</button></a>--%>
+<%--</div>--%>
+
 <!-- 模态框（Modal） -->
 <div class="modal fade" id="toGetData" tabindex="-1" role="dialog"
      aria-labelledby="myModalLabel" aria-hidden="true">
@@ -169,6 +252,7 @@
 </body>
 <script src="<%=basePath%>resources/js/jquery.min.js"></script>
 <script src="<%=basePath%>resources/js/bootstrap.min.js"></script>
+<script src="<%=basePath%>resources/js/jquery.table2excel.js"></script>
 <script language="javascript">
   function getData()
   {
@@ -179,6 +263,17 @@
       alert("欢迎您："+ name)
     }
 
+  }
+  //写excel文件
+  function writeExcel() {
+    $(".table2excel").table2excel({
+      exclude: ".noExl",
+      name: "导出表",
+      filename: "数据服务接口",
+      exclude_img: true,
+      exclude_links: true,
+      exclude_inputs: true
+    });
   }
   function openUrl(){
     var dbtype = $("select[name='dbtype']").val();
@@ -207,5 +302,79 @@
       }
     });
   }
+  function editSubmit(){
+
+  }
+
+  //删除一行数据
+  function deleteTr(it,index){
+    if(confirm("你确认删除这条数据吗？")){
+      $.ajax({
+        type: "GET",
+        url: "deleteApi",
+        data: {
+          index: index,
+        },
+        success: function(data){
+          if(data.result ==1)
+            $(it).parent().parent().parent().remove();
+
+        },
+        error: function(message){
+          console.log(message);
+          alert("操作失败，请重试～！");
+        }
+      });
+    }
+  }
+  //编辑这一行数据
+  function editTr(it,index){
+    var id = $(it).attr("id");
+//    $(it).attr("id",id=="edit"?"confirm":"edit");
+    if($(it).attr("id") == "edit"){
+      $(it).removeClass("glyphicon glyphicon-pencil");
+      $(it).addClass("glyphicon glyphicon-ok");
+      $(it).attr("id","confirm");
+    }else if($(it).attr("id") == "confirm"){
+      //提交给后台
+      $.ajax({
+        type: "GET",
+        url: "editApi",
+        async:false,
+        data: {
+          index: index,
+          cata:$(it).parent().parent().siblings("td").eq(1).text(),
+          name:$(it).parent().parent().siblings("td").eq(2).text(),
+          todo:$(it).parent().parent().siblings("td").eq(3).text(),
+          method:$(it).parent().parent().siblings("td").eq(4).text(),
+          para:$(it).parent().parent().siblings("td").eq(5).text(),
+          url:$(it).parent().parent().siblings("td").eq(6).text(),
+          demo:$(it).parent().parent().siblings("td").eq(7).text(),
+          reback:$(it).parent().parent().siblings("td").eq(8).text(),
+        },
+        success: function(data){
+          $(it).attr("id","edit");
+        },
+        error: function(message){
+          return ;
+        }
+      });
+      $(it).removeClass("glyphicon glyphicon-ok");
+      $(it).addClass("glyphicon glyphicon-pencil");
+    }
+
+    $(it).parent().parent().siblings("td").each(function() {  // 获取当前行的其他单元格
+      obj_text = $(this).find("input:text");    // 判断单元格下是否有文本框
+      if(!obj_text.length)   // 如果没有文本框，则添加文本框使之可以编辑
+        $(this).html("<input type='text' value='"+$(this).text()+"'>");
+      else   // 如果已经存在文本框，则将其显示为文本框修改的值
+        $(this).html(obj_text.val());
+    });
+
+  }
+  function addApi(){
+
+  }
+
 </script>
 </html>
