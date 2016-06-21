@@ -2,8 +2,6 @@ package com.wyz.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wyz.entity.Api;
-import com.wyz.entity.DatabaseInfo;
-import com.wyz.entity.Table;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,7 +11,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -331,7 +328,7 @@ public class ApisController {
 
     @RequestMapping(value="get_database_design",method={RequestMethod.POST, RequestMethod.GET})
     public String get_database_design(HttpServletRequest request, HttpServletResponse response) {
-        return "database_design";
+        return "/database_design.html";
     }
 
 }

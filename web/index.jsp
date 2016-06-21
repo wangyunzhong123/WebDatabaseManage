@@ -50,7 +50,7 @@
   <div class="col-sm-3 col-md-2 sidebar">
     <ul class="nav nav-sidebar nav_my_ul">
       <li class="active"><a href="#">相关操作 <span class="sr-only">(current)</span></a></li>
-      <li><a href="<%=basePath%>get_database_design" target="_blank">数据标准规范</a></li>
+      <li><a href="database_design.html" target="_blank">数据标准规范</a></li>
       <li><a href="#" data-toggle="modal" data-target="#toGetData">数据抓取平台</a></li>
       <li><a href="javascript:writeExcel();" target="_blank">数据服务接口</a></li>
       <li><a href="javascript:alert('请使用相应的数据库管理软件操作！')">数据结构扩展</a></li>
@@ -316,9 +316,7 @@
           index: index,
         },
         success: function(data){
-          if(data.result ==1)
-            $(it).parent().parent().parent().remove();
-
+          $(it).parent().parent().parent().remove();
         },
         error: function(message){
           console.log(message);
@@ -338,24 +336,27 @@
     }else if($(it).attr("id") == "confirm"){
       //提交给后台
       $.ajax({
-        type: "GET",
+        type: "POST",
         url: "editApi",
         async:false,
+        contentType:"application/x-www-form-urlencoded;charset=utf-8",
         data: {
           index: index,
-          cata:$(it).parent().parent().siblings("td").eq(1).text(),
-          name:$(it).parent().parent().siblings("td").eq(2).text(),
-          todo:$(it).parent().parent().siblings("td").eq(3).text(),
-          method:$(it).parent().parent().siblings("td").eq(4).text(),
-          para:$(it).parent().parent().siblings("td").eq(5).text(),
-          url:$(it).parent().parent().siblings("td").eq(6).text(),
-          demo:$(it).parent().parent().siblings("td").eq(7).text(),
-          reback:$(it).parent().parent().siblings("td").eq(8).text(),
+          cata:$(it).parent().parent().siblings().find("input").eq(1).val(),
+          name:$(it).parent().parent().siblings().find("input").eq(2).val(),
+          todo:$(it).parent().parent().siblings().find("input").eq(3).val(),
+          method:$(it).parent().parent().siblings().find("input").eq(4).val(),
+          para:$(it).parent().parent().siblings().find("input").eq(5).val(),
+          url:$(it).parent().parent().siblings().find("input").eq(6).val(),
+          demo:$(it).parent().parent().siblings().find("input").eq(7).val(),
+          reback:$(it).parent().parent().siblings().find("input").eq(8).val(),
         },
         success: function(data){
+          console.log(data);
           $(it).attr("id","edit");
         },
         error: function(message){
+          console.log(message);
           return ;
         }
       });
